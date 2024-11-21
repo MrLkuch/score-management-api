@@ -29,7 +29,7 @@ class TeamController extends AbstractController
         return $this->json($team, Response::HTTP_OK, [], ['groups' => 'team:read']);
     }
 
-    #[Route('', name: 'create_team', methods: ['POST'])]
+    #[Route('/add', name: 'create_team', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
         $team = $serializer->deserialize($request->getContent(), Team::class, 'json');

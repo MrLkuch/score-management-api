@@ -29,7 +29,7 @@ class ScoreController extends AbstractController
         return $this->json($score, Response::HTTP_OK, [], ['groups' => 'score:read']);
     }
 
-    #[Route('', name: 'create_score', methods: ['POST'])]
+    #[Route('/add', name: 'create_score', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
         $score = $serializer->deserialize($request->getContent(), Score::class, 'json');

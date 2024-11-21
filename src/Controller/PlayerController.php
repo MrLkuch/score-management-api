@@ -29,7 +29,7 @@ class PlayerController extends AbstractController
         return $this->json($player, Response::HTTP_OK, [], ['groups' => 'player:read']);
     }
 
-    #[Route('', name: 'create_player', methods: ['POST'])]
+    #[Route('/add', name: 'create_player', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
         $player = $serializer->deserialize($request->getContent(), Player::class, 'json');
