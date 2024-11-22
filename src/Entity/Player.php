@@ -24,10 +24,8 @@ class Player
     #[Groups(['player:read', 'player:write', 'team:read'])]
     private ?string $lastName = null;
 
-    #[ORM\ManyToOne(inversedBy: 'players')]
+    #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'players')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['player:read', 'player:write'])]
-    #[MaxDepth(1)]
     private ?Team $team = null;
 
     public function getId(): ?int

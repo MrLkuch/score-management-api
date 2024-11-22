@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Player;
+use App\Entity\Team;
 use App\Repository\PlayerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,8 +33,25 @@ class PlayerController extends AbstractController
     #[Route('/add', name: 'create_player', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
-        $player = $serializer->deserialize($request->getContent(), Player::class, 'json');
-        
+        $data = json_decode($request->getContent(), true);
+
+        // Vérifiez si un ID d'équipe est fourni
+        if (!isset($data['team']['id'])) {
+            return $this->json(['error' => 'Team ID is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Recherchez l'équipe existante
+        $team = $em->getRepository(Team::class)->find($data['team']['id']);
+        if (!$team) {
+            return $this->json(['error' => 'Team not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Créez le joueur
+        $player = new Player();
+        $player->setFirstName($data['firstName']);
+        $player->setLastName($data['lastName']);
+        $player->setTeam($team);
+
         $errors = $validator->validate($player);
         if (count($errors) > 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
