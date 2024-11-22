@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Score;
+use App\Entity\Team;
 use App\Repository\ScoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,10 +31,26 @@ class ScoreController extends AbstractController
     }
 
     #[Route('/add', name: 'create_score', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    public function create(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
-        $score = $serializer->deserialize($request->getContent(), Score::class, 'json');
-        
+        $data = json_decode($request->getContent(), true);
+
+        // Vérifiez si un ID d'équipe est fourni
+        if (!isset($data['team']['id'])) {
+            return $this->json(['error' => 'Team ID is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Recherchez l'équipe existante
+        $team = $em->getRepository(Team::class)->find($data['team']['id']);
+        if (!$team) {
+            return $this->json(['error' => 'Team not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Créez le score
+        $score = new Score();
+        $score->setPoints($data['points']);
+        $score->setTeam($team);
+
         $errors = $validator->validate($score);
         if (count($errors) > 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);

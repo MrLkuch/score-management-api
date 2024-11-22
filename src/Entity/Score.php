@@ -16,10 +16,9 @@ class Score
     #[Groups(['score:read', 'team:read'])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'scores')]
+    #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'scores')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['score:read', 'score:write'])]
-    #[MaxDepth(1)]
     private ?Team $team = null;
 
     #[ORM\Column]
